@@ -1,0 +1,43 @@
+<ion-content padding>
+  <form [formGroup]="signupForm" (submit)="signupUser()" novalidate>
+
+    <ion-item>
+      <ion-label stacked>Email</ion-label>
+      <ion-input formControlName="email" type="email" placeholder="Your email address"
+        [class.invalid]="!signupForm.controls.email.valid && blur">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Password</ion-label>
+      <ion-input formControlName="password" type="password" placeholder="Your password"
+        [class.invalid]="!signupForm.controls.password.valid && blur">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>First Name</ion-label>
+      <ion-input formControlName="firstName" type="text"
+        [class.invalid]="!signupForm.controls.firstName.valid && blur">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Last Name</ion-label>
+      <ion-input formControlName="lastName" type="text"
+        [class.invalid]="!signupForm.controls.lastName.valid && blur">
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Phone</ion-label>
+      <ion-input formControlName="phone" type="phone"
+        [class.invalid]="!signupForm.controls.phone.valid && blur">
+      </ion-input>
+    </ion-item>
+
+    <button ion-button block type="submit" [disabled]="!signupForm.valid">
+      Create an Account
+    </button>
+  </form>
+</ion-content>

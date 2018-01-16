@@ -14,3 +14,24 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
+
+.footer{
+  text-align: center;
+}
+
+.footer ion-toolbar{
+  border-top: 2px solid #000;
+}
+
+.header ion-toolbar{
+  border-bottom: 2px solid #000;
+}
+
+.side-menu{
+  background-color: #000000 !important;
+}
+
+.side-menu button{
+  color: #ffffff;
+  background-color: transparent !important;
+}

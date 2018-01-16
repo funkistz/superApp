@@ -1,14 +1,63 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>
-      Ionic Blank
-    </ion-title>
+<ion-header class="header">
+
+  <ion-navbar color="secondary">
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>SuperApp</ion-title>
   </ion-navbar>
+
+  <ion-toolbar color="primary">
+    <ion-title *ngIf="(helpBroadcast | async)?.status == 'broadcasting'">Getting your Hero...</ion-title>
+    <ion-title *ngIf="(helpBroadcast | async)?.status != 'broadcasting'">Welcome {{ user.first_name }}</ion-title>
+  </ion-toolbar>
+
 </ion-header>
 
-<ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+<ion-content>
+
+  <agm-map [latitude]="lat" [longitude]="lng" class="map">
+    <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+  </agm-map>
+
 </ion-content>
+
+<ion-footer class="footer">
+  <ion-toolbar color="primary">
+
+          <!-- closed -->
+          <button *ngIf=" (helpBroadcast | async)?.status == 'idle' || (helpBroadcast | async)?.status == null" ion-button color="danger" (click)="getHelp()">
+            Help Me !
+          </button>
+          <button *ngIf=" (helpBroadcast | async)?.status == 'idle' || (helpBroadcast | async)?.status == null" ion-button color="success" (click)="rescue()">
+            Ready to Rescue
+          </button>
+
+          <!-- searching -->
+          <button *ngIf="(helpBroadcast | async)?.status == 'searching'" icon-left ion-button color="danger" (click)="cancelRescuing()">
+            <ion-icon name="close"></ion-icon>
+            Cancel
+          </button>
+
+          <!-- broadcasting -->
+          <button *ngIf="(helpBroadcast | async)?.status == 'broadcasting'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
+            <ion-icon name="close"></ion-icon>
+            Cancel
+          </button>
+
+          <!-- solving -->
+          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
+            <ion-icon name="call"></ion-icon>
+            Call
+          </button>
+          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
+            <ion-icon name="close"></ion-icon>
+            Cancel
+          </button>
+          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
+            <ion-icon name="checkmark"></ion-icon>
+            Solved
+          </button>
+
+  </ion-toolbar>
+</ion-footer>
