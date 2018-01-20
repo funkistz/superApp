@@ -1,0 +1,29 @@
+<!--
+  Generated template for the CancelHelpPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Cancel Help</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item text-center>
+      <h4>You can use your power to help him/her.</h4>
+      <h4>Why do you want to cancel it?</h4>
+    </ion-item>
+    <ion-item>
+      <ion-textarea placeholder="Type something..." [(ngModel)]="reason"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <button ion-button block color="danger" (click)="submit()">Submit</button>
+  <button ion-button block (click)="cancel()" color="light">Cancel</button>
+</ion-content>

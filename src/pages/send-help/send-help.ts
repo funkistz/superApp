@@ -35,7 +35,6 @@ export class SendHelpPage {
   {
       this.problemCollection = this.afs.collection('problemType');
       this.problem$ = this.problemCollection.valueChanges();
-      this.helpBroadcastCollection = this.afs.collection('helpBroadcast');
 
       platform.ready().then(() => {
         this.getCurrentLocation()

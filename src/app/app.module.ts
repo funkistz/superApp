@@ -9,20 +9,25 @@ import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SendHelpPage } from '../pages/send-help/send-help';
 import { RescuePage } from '../pages/rescue/rescue';
+import { DirectionPage } from '../pages/direction/direction';
+import { CancelHelpPage } from '../pages/cancel-help/cancel-help';
 
 import { AuthProvider } from '../providers/auth/auth';
 import { SuperProvider } from '../providers/super/super';
+import { UserProvider } from '../providers/user/user';
 
 // Import the AF2 Module
 import { AngularFireModule } from 'angularfire2';
-import { AngularFireDatabaseModule } from 'angularfire2/database';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabaseModule, AngularFireDatabase } from 'angularfire2/database';
 // for AngularFireAuth
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AgmCoreModule } from '@agm/core';
 import {Geolocation} from '@ionic-native/geolocation';
+
+import { CallNumber } from '@ionic-native/call-number';
+import { SMS } from '@ionic-native/sms';
 
 // AF2 Settings
 export const firebaseConfig = {
@@ -40,7 +45,9 @@ export const firebaseConfig = {
     HomePage,
     LoginPage,
     SendHelpPage,
-    RescuePage
+    RescuePage,
+    DirectionPage,
+    CancelHelpPage
   ],
   imports: [
     BrowserModule,
@@ -57,7 +64,9 @@ export const firebaseConfig = {
     HomePage,
     LoginPage,
     SendHelpPage,
-    RescuePage
+    RescuePage,
+    DirectionPage,
+    CancelHelpPage
   ],
   providers: [
     StatusBar,
@@ -65,8 +74,11 @@ export const firebaseConfig = {
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     SuperProvider,
+    UserProvider,
     Geolocation,
-    AngularFireDatabase
+    AngularFireDatabase,
+    CallNumber,
+    SMS
   ]
 })
 export class AppModule {}

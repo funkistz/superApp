@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import firebase from 'firebase';
-import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
+import {AngularFireDatabase} from 'angularfire2/database';
 import {
   AngularFirestore,
   AngularFirestoreDocument ,
@@ -11,7 +11,7 @@ import { Observable } from 'rxjs/Observable';
 @Injectable()
 export class AuthProvider {
 
-  userList : FirebaseListObservable<any>;
+  userList : AngularFirestoreCollection<any>;
   user_key : any;
   public accountInfo;
 
@@ -35,7 +35,6 @@ export class AuthProvider {
   loginUser(email: string, password: string): Promise<any> {
 
     let user = firebase.auth().signInWithEmailAndPassword(email, password);
-    this.setUserData(user);
 
     return user;
   }

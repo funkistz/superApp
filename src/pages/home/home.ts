@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, Platform, ToastController, LoadingController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { SuperProvider } from '../../providers/super/super';
+import { UserProvider } from '../../providers/user/user';
 import { Geolocation } from '@ionic-native/geolocation';
 import {
   AngularFirestore,
@@ -21,20 +22,25 @@ export class HomePage {
 
     @ViewChild('map') mapElement: ElementRef;
     google : any;
-    lat: any;
-    lng: any;
+    label = {text: 'You'};
     private map: any;
-    user:any;
     loading: any;
+    user: any;
 
-    helpBroadcastRef: AngularFirestoreDocument<any>;
-    helpBroadcast: Observable<any>;
+    userRef: AngularFirestoreDocument<any>;
+    userReal: Observable<any>;
+
+    victimsRef:  AngularFirestoreCollection<any>;
+    victims:  Observable<any[]>;
+
+    victimOffline:any;
 
     constructor(
       public platform: Platform,
       public navCtrl: NavController,
       public authData: AuthProvider,
       public superData: SuperProvider,
+      public userData: UserProvider,
       private geolocation: Geolocation,
       public toastCtrl: ToastController,
       public loadingCtrl: LoadingController,
@@ -44,12 +50,30 @@ export class HomePage {
 
       this.user = this.authData.getUserData();
 
-      this.helpBroadcastRef = this.afs.doc('users/' + this.user.id);
-      this.helpBroadcast = this.helpBroadcastRef.valueChanges();
+      this.userRef = this.afs.doc('users/' + this.user.id);
+      this.userReal = this.userRef.valueChanges();
+
+      this.victimsRef = this.afs.collection('users', ref => ref.where('hero', '==', this.user.id));
+      this.victims = this.victimsRef.valueChanges();
+
+      this.victimsRef.snapshotChanges().map( v => {
+          return v.map(a => {
+              const data = a.payload.doc.data();
+              const id = a.payload.doc.id;
+              return { id, ...data };
+          });
+      }).subscribe(docs => {
+
+        docs.forEach(doc => {
+          this.victimOffline = doc;
+        });
+
+      });
+
 
       platform.ready().then(() => {
           this.getCurrentLocation()
-           console.log("Start Loding MAP....")
+            console.log("Start Loding MAP....")
        });
 
     }
@@ -57,8 +81,11 @@ export class HomePage {
     getCurrentLocation():void{
       this.geolocation.getCurrentPosition().then((resp) => {
 
-        this.lat = resp.coords.latitude;
-        this.lng = resp.coords.longitude;
+        this.userData.update({
+          lat: resp.coords.latitude,
+          lng: resp.coords.longitude
+        });
+
       }).catch((error) => {
           console.log('Error getting location', error);
       });
@@ -77,35 +104,65 @@ export class HomePage {
       this.loading = this.loadingCtrl.create({
         content: 'Searching...'
       });
-
       this.loading.present();
 
-      let data = {
+      this.userData.update({
         status: 'searching',
-        lat: this.lat,
-        lng: this.lng
-      };
-
-      this.afs.doc('users/' + this.user.id)
-      .update(
-        data
-      )
-      .then(() => {
-      })
-      .catch((error) => {
-
-          this.afs.doc('users/' + this.user.id)
-          .set(
-            data
-          );
-
       });
 
-      this.loading.dismiss();
+      var count = 0;
+      var temp = this;
+      var temp_victims = this.superData.setHelpBroadcast();
 
-      //test
-      let userx = this.superData.getUsers();
+      var interval = setInterval(function(){
+        count++;
 
+        if(count > 5){
+          clearInterval(interval);
+          temp.loading.dismiss();
+          temp.userData.update({
+            status: 'idle',
+            victim: null
+          });
+          let toast = temp.toastCtrl.create({
+            message: 'No victim found',
+            duration: 3000
+          });
+          toast.present();
+        }
+
+        if(temp.superData.getHelpBroadcast()){
+          clearInterval(interval);
+
+          var victimx = temp.superData.getHelpBroadcast();
+          temp.userData.update({
+            status: 'searching',
+            victim: victimx.id,
+          });
+          temp.userData.updateOther(
+          victimx.id,
+          {
+            hero: temp.user.id,
+          });
+
+          temp.loading.dismiss();
+          let toast = temp.toastCtrl.create({
+            message: 'Nearest victim found',
+            duration: 3000
+          });
+          toast.present();
+
+        }else{
+          console.log('waiting...');
+        }
+      }, 1000);
+
+    }
+
+    goRescuing() {
+      this.navCtrl.push(RescuePage, {
+          user: this.victimsRef
+      });
     }
 
     help(marker):void{
@@ -118,7 +175,7 @@ export class HomePage {
 
     cancelBroadcasting():void{
 
-      this.helpBroadcastRef.update({
+      this.userRef.update({
         status: 'idle',
       })
       .then(() => {
@@ -139,10 +196,16 @@ export class HomePage {
 
     cancelRescuing():void{
 
-      this.helpBroadcastRef.update({
+      this.userRef.update({
         status: 'idle',
       })
       .then(() => {
+
+        this.userData.updateOther(
+        this.victimOffline.id,
+        {
+          hero: null,
+        });
 
         let toast = this.toastCtrl.create({
           message: 'Search canceled',

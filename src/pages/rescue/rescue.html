@@ -7,12 +7,22 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>rescue</ion-title>
+    <ion-title>Rescue</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+
+  <ion-list *ngFor="let victim of users | async">
+    <ion-list-header>
+      {{ victim.first_name }}
+    </ion-list-header>
+    <ion-item>Problem : {{ victim.problem }}</ion-item>
+    <ion-item>Phone no : {{ victim.phone }}</ion-item>
+
+    <button ion-button block color="danger" margin-top (click)="getDirection(victim)" >Rescue Now!</button>
+  </ion-list>
 
 </ion-content>

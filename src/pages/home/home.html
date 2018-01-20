@@ -8,16 +8,24 @@
   </ion-navbar>
 
   <ion-toolbar color="primary">
-    <ion-title *ngIf="(helpBroadcast | async)?.status == 'broadcasting'">Getting your Hero...</ion-title>
-    <ion-title *ngIf="(helpBroadcast | async)?.status != 'broadcasting'">Welcome {{ user.first_name }}</ion-title>
+    <ion-title *ngIf="(userReal | async)?.status == 'broadcasting'">Getting your Hero...</ion-title>
+    <ion-title *ngIf="(userReal | async)?.status != 'broadcasting'">Welcome {{ (userReal | async)?.first_name }}</ion-title>
   </ion-toolbar>
 
 </ion-header>
 
 <ion-content>
 
-  <agm-map [latitude]="lat" [longitude]="lng" class="map">
-    <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker>
+  <!-- <ion-list>
+    <ion-item *ngFor="let victim of victims | async">
+      <button ion-button block>{{ victim.first_name }}</button>
+    </ion-item>
+  </ion-list> -->
+
+  <agm-map [latitude]="user.lat" [longitude]="user.lng" class="map">
+    <agm-marker [latitude]="(userReal | async)?.lat" [longitude]="(userReal | async)?.lng" [label]="label"></agm-marker>
+    <agm-marker *ngFor="let victim of victims | async" [latitude]="victim.lat" [longitude]="victim.lng" [label]="victim.first_name"></agm-marker>
+
   </agm-map>
 
 </ion-content>
@@ -26,35 +34,39 @@
   <ion-toolbar color="primary">
 
           <!-- closed -->
-          <button *ngIf=" (helpBroadcast | async)?.status == 'idle' || (helpBroadcast | async)?.status == null" ion-button color="danger" (click)="getHelp()">
+          <button *ngIf=" (userReal | async)?.status == 'idle' || (userReal | async)?.status == null" ion-button color="danger" (click)="getHelp()">
             Help Me !
           </button>
-          <button *ngIf=" (helpBroadcast | async)?.status == 'idle' || (helpBroadcast | async)?.status == null" ion-button color="success" (click)="rescue()">
+          <button *ngIf=" (userReal | async)?.status == 'idle' || (userReal | async)?.status == null" ion-button color="success" (click)="rescue()">
             Ready to Rescue
           </button>
 
           <!-- searching -->
-          <button *ngIf="(helpBroadcast | async)?.status == 'searching'" icon-left ion-button color="danger" (click)="cancelRescuing()">
+          <button *ngIf="(userReal | async)?.status == 'searching'" icon-left ion-button color="danger" (click)="cancelRescuing()">
             <ion-icon name="close"></ion-icon>
             Cancel
           </button>
+          <button *ngIf="(userReal | async)?.status == 'searching'" icon-left ion-button color="success" (click)="goRescuing()">
+            <ion-icon name="close"></ion-icon>
+            Rescue now
+          </button>
 
           <!-- broadcasting -->
-          <button *ngIf="(helpBroadcast | async)?.status == 'broadcasting'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
+          <button *ngIf="(userReal | async)?.status == 'broadcasting'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
             <ion-icon name="close"></ion-icon>
             Cancel
           </button>
 
           <!-- solving -->
-          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
+          <button *ngIf="(userReal | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
             <ion-icon name="call"></ion-icon>
             Call
           </button>
-          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
+          <button *ngIf="(userReal | async)?.status == 'solving'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
             <ion-icon name="close"></ion-icon>
             Cancel
           </button>
-          <button *ngIf="(helpBroadcast | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
+          <button *ngIf="(userReal | async)?.status == 'solving'" icon-left ion-button color="success" (click)="cancelBroadcasting()">
             <ion-icon name="checkmark"></ion-icon>
             Solved
           </button>

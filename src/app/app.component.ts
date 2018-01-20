@@ -63,7 +63,8 @@ export class MyApp {
 
         this.user = userAuth;
 
-        this.userCollection = this.afs.collection('users', ref => ref.where('email', '==', this.user.email).limit(1) );
+        console.log(userAuth);
+        this.userCollection = this.afs.collection('users', ref => ref.where('email', '==', userAuth.email).limit(1) );
 
         this.users = this.userCollection.snapshotChanges().map( v => {
             return v.map(a => {

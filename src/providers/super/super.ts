@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import firebase from 'firebase';
-import {AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
 import {
   AngularFirestore,
   AngularFirestoreDocument ,
@@ -8,34 +7,30 @@ import {
 } from 'angularfire2/firestore';
 import { Observable } from 'rxjs/Observable';
 import { AuthProvider } from '../auth/auth';
+import geolib from 'geolib';
 
 @Injectable()
 export class SuperProvider {
 
-  userList : FirebaseListObservable<any>;
+  userList : AngularFirestoreCollection<any>;
   users: Observable<any[]>;
-  userArray:any[] = [];
+  userArray:any = {};
 
-  public accountInfo;
+  public helpBroadcast:any = {};
 
   constructor(
-    public aDB: AngularFireDatabase,
     private afs: AngularFirestore,
     public authData: AuthProvider,
   )
   {
-    this.userList = this.afs.collection('users');
-    this.users = this.userList.snapshotChanges().map( v => {
-        return v.map(a => {
-            const data = a.payload.doc.data();
-            const id = a.payload.doc.id;
-            return { id, ...data };
-        });
-    });
+
+
+
   }
 
-  getUsers(){
+  setHelpBroadcast(){
 
+    this.userList = this.afs.collection('users', ref => ref.where('status', '==', 'broadcasting'));
     this.users = this.userList.snapshotChanges().map( v => {
         return v.map(a => {
             const data = a.payload.doc.data();
@@ -47,40 +42,38 @@ export class SuperProvider {
     this.users.subscribe(docs => {
 
       docs.forEach(doc => {
-        this.userArray[doc.id] = doc;
-        this.userArray[doc.id]['lon'] = doc.lng;
-      })
+        this.userArray[doc.id] = {};
+        this.userArray[doc.id]['latitude'] = doc.lat;
+        this.userArray[doc.id]['longitude'] = doc.lng;
 
+      });
+
+      this.helpBroadcast = this.userArray;
     })
 
-    var sphereKnn = require("sphere-knn"),
-    lookup    = sphereKnn(this.userArray);
-
-    var points = lookup(this.authData.getUserData().lat, this.authData.getUserData().lng, 1, 200);
-
-    console.log(points);
-    console.log(lookup);
-    console.log(this.userArray);
-    return this.userList.valueChanges();
   }
 
-  closestLocation(targetLocation, locationData) {
-    function vectorDistance(dx, dy) {
-        return Math.sqrt(dx * dx + dy * dy);
-    }
+  getHelpBroadcast(){
 
-    function locationDistance(location1, location2) {
-        var dx = location1.latitude - location2.latitude,
-            dy = location1.longitude - location2.longitude;
 
-        return vectorDistance(dx, dy);
-    }
+      if(this.helpBroadcast != null){
 
-    return locationData.reduce(function(prev, curr) {
-        var prevDistance = locationDistance(targetLocation , prev),
-            currDistance = locationDistance(targetLocation , curr);
-        return (prevDistance < currDistance) ? prev : curr;
-    });
-}
+        var spot = {latitude:this.authData.getUserData().lat, longitude:this.authData.getUserData().lng};
+        var points = geolib.findNearest(spot, this.helpBroadcast);
+
+        if(points != null){
+
+          this.helpBroadcast[points['key']]['id'] = points['key'];
+
+          return this.helpBroadcast[points['key']];
+        }else{
+
+          return null;
+        }
+      }else{
+        return null;
+      }
+  }
+
 
 }
