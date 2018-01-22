@@ -6,7 +6,7 @@
 -->
 <ion-header>
 
-  <ion-navbar>
+  <ion-navbar color="secondary">
     <ion-title>Rescue</ion-title>
   </ion-navbar>
 
@@ -16,9 +16,9 @@
 <ion-content padding>
 
   <ion-list *ngFor="let victim of users | async">
-    <ion-list-header>
+    <h4>
       {{ victim.first_name }}
-    </ion-list-header>
+    </h4>
     <ion-item>Problem : {{ victim.problem }}</ion-item>
     <ion-item>Phone no : {{ victim.phone }}</ion-item>
 

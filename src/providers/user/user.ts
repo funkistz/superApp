@@ -27,6 +27,23 @@ export class UserProvider {
 
   }
 
+  refresh(){
+
+      this.userList = this.afs.collection('users', ref => ref.where('email', '==', this.authData.getUserData().email).limit(1) );
+
+      this.users = this.userList.snapshotChanges().map( v => {
+          return v.map(a => {
+              const data = a.payload.doc.data();
+              const id = a.payload.doc.id;
+              return { id, ...data };
+          });
+      });
+
+      this.users.subscribe(docs => {
+        this.authData.setUserData(docs[0]);
+      })
+  }
+
   update(data){
 
     this.afs.doc('users/' + this.authData.getUserData().id)

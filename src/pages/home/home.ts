@@ -1,9 +1,11 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { NavController, Platform, ToastController, LoadingController } from 'ionic-angular';
+import { NavController, Platform, ToastController, LoadingController, AlertController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { SuperProvider } from '../../providers/super/super';
 import { UserProvider } from '../../providers/user/user';
 import { Geolocation } from '@ionic-native/geolocation';
+import { CallNumber } from '@ionic-native/call-number';
+
 import {
   AngularFirestore,
   AngularFirestoreDocument ,
@@ -13,6 +15,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { SendHelpPage } from '../send-help/send-help';
 import { RescuePage } from '../rescue/rescue';
+import { RatingPage } from '../rating/rating';
 
 @Component({
   selector: 'page-home',
@@ -30,15 +33,20 @@ export class HomePage {
     userRef: AngularFirestoreDocument<any>;
     userReal: Observable<any>;
 
-    victimsRef:  AngularFirestoreCollection<any>;
-    victims:  Observable<any[]>;
+    victimsRef: AngularFirestoreCollection<any>;
+    victims: Observable<any[]>;
+    victimx: any;
 
     victimOffline:any;
+    userRealLoop:any = 0;
+    public alertPresented: any;
 
     constructor(
       public platform: Platform,
       public navCtrl: NavController,
       public authData: AuthProvider,
+      public alertCtrl: AlertController,
+      private callNumber: CallNumber,
       public superData: SuperProvider,
       public userData: UserProvider,
       private geolocation: Geolocation,
@@ -48,25 +56,67 @@ export class HomePage {
     )
     {
 
+      this.alertPresented = false;
       this.user = this.authData.getUserData();
 
       this.userRef = this.afs.doc('users/' + this.user.id);
       this.userReal = this.userRef.valueChanges();
 
-      this.victimsRef = this.afs.collection('users', ref => ref.where('hero', '==', this.user.id));
-      this.victims = this.victimsRef.valueChanges();
+      this.userReal.subscribe(doc => {
 
-      this.victimsRef.snapshotChanges().map( v => {
-          return v.map(a => {
-              const data = a.payload.doc.data();
-              const id = a.payload.doc.id;
-              return { id, ...data };
+        this.userData.refresh();
+        if(doc['status'] == "assisted" && doc['hero_status'] == "first" && this.userRealLoop == 0){
+
+            this.userRealLoop == 1;
+            this.showAlert();
+
+        }
+
+        if(doc['status'] == "canceled_assist"){
+
+            this.assistCanceled();
+
+        }
+
+        if(doc['status'] == "searching" || doc['status'] == "helping"){
+
+          this.victimsRef = this.afs.collection('users', ref => ref.where('hero', '==', this.user.id));
+          this.victims = this.victimsRef.valueChanges();
+
+          this.victimsRef.snapshotChanges().map( v => {
+              return v.map(a => {
+                  const data = a.payload.doc.data();
+                  const id = a.payload.doc.id;
+                  return { id, ...data };
+              });
+          }).subscribe(docs => {
+
+            docs.forEach(doc => {
+              this.victimOffline = doc;
+            });
+
           });
-      }).subscribe(docs => {
 
-        docs.forEach(doc => {
-          this.victimOffline = doc;
-        });
+        }else if(doc['status'] == "assisted"){
+
+          this.victimsRef = this.afs.collection('users', ref => ref.where('victim', '==', this.user.id));
+          this.victims = this.victimsRef.valueChanges();
+
+          this.victimsRef.snapshotChanges().map( v => {
+              return v.map(a => {
+                  const data = a.payload.doc.data();
+                  const id = a.payload.doc.id;
+                  return { id, ...data };
+              });
+          }).subscribe(docs => {
+
+            docs.forEach(doc => {
+              this.victimOffline = doc;
+            });
+
+          });
+
+        }
 
       });
 
@@ -134,13 +184,13 @@ export class HomePage {
         if(temp.superData.getHelpBroadcast()){
           clearInterval(interval);
 
-          var victimx = temp.superData.getHelpBroadcast();
+          temp.victimx = temp.superData.getHelpBroadcast();
           temp.userData.update({
             status: 'searching',
-            victim: victimx.id,
+            victim: temp.victimx.id,
           });
           temp.userData.updateOther(
-          victimx.id,
+          temp.victimx.id,
           {
             hero: temp.user.id,
           });
@@ -160,17 +210,22 @@ export class HomePage {
     }
 
     goRescuing() {
+
+      this.userData.updateOther(
+      this.victimOffline.id,
+      {
+        status: 'assisted',
+        hero_status: 'first',
+      });
+
+      this.userData.update(
+      {
+        status: 'helping',
+      });
+
       this.navCtrl.push(RescuePage, {
           user: this.victimsRef
       });
-    }
-
-    help(marker):void{
-      let toast = this.toastCtrl.create({
-        message: 'lol',
-        duration: 3000
-      });
-      toast.present();
     }
 
     cancelBroadcasting():void{
@@ -221,4 +276,128 @@ export class HomePage {
 
     }
 
+    showAlert(){
+
+        let vm = this
+        if(!vm.alertPresented) {
+          vm.alertPresented = true
+          vm.alertCtrl.create({
+            title: 'Hero is on the way!',
+            message: "Hi " + this.user.first_name + ". your hero is on the way!",
+            buttons: [
+              {
+                text: 'Close',
+                handler: data => {
+                  this.userData.update({
+                    hero_status: 'aware'
+                  });
+                }
+              }
+            ]
+          }).present();
+        }
+
+    }
+
+    cancelHero(){
+
+      let prompt = this.alertCtrl.create({
+        title: 'Cancel Hero',
+        message: "Your hero is already on his/her way to help you. Why do you want to cancel it?",
+        inputs: [
+          {
+            name: 'reason',
+            placeholder: 'Type something...'
+          },
+        ],
+        buttons: [
+          {
+            text: 'Cancel',
+            handler: data => {
+
+            }
+          },
+          {
+            text: 'Submit',
+            handler: data => {
+              this.userData.update({
+                hero_cancel_reason: data.reason,
+                status: 'idle'
+              });
+              this.userRealLoop == 1;
+            }
+          }
+        ]
+      });
+      prompt.present();
+
+    }
+
+    problemSolved(){
+
+      let prompt = this.alertCtrl.create({
+        title: 'Confirmation',
+        message: "Confirm problem solved",
+        buttons: [
+          {
+            text: 'Cancel',
+            handler: data => {
+
+            }
+          },
+          {
+            text: 'Submit',
+            handler: data => {
+
+              this.userData.update({
+                status: 'idle',
+                hero: null
+              });
+              this.userRealLoop == 1;
+              this.userData.refresh();
+
+              this.navCtrl.push(RatingPage, {
+                  user_id: this.authData.getUserData().hero
+              }).then(response => {
+              }).catch(e => {
+                  console.log(e);
+              });
+
+            }
+          }
+        ]
+      });
+      prompt.present();
+
+    }
+
+
+    callHero(){
+      this.callNumber.callNumber(this.victimOffline.phone, true)
+      .then(() => console.log('Launched dialer!'))
+      .catch(() => console.log('Error launching dialer'));
+    }
+
+    assistCanceled(){
+
+        let vm = this
+        if(!vm.alertPresented) {
+          vm.alertPresented = true
+          vm.alertCtrl.create({
+            title: 'Your hero withdraw from helping you',
+            message: "Reason: " + this.authData.getUserData().reason,
+            buttons: [
+              {
+                text: 'Close',
+                handler: data => {
+                  this.userData.update({
+                    status: 'broadcasting'
+                  });
+                }
+              }
+            ]
+          }).present();
+        }
+
+    }
 }

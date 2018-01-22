@@ -11,6 +11,7 @@ import { SendHelpPage } from '../pages/send-help/send-help';
 import { RescuePage } from '../pages/rescue/rescue';
 import { DirectionPage } from '../pages/direction/direction';
 import { CancelHelpPage } from '../pages/cancel-help/cancel-help';
+import { RatingPage } from '../pages/rating/rating';
 
 import { AuthProvider } from '../providers/auth/auth';
 import { SuperProvider } from '../providers/super/super';
@@ -28,6 +29,9 @@ import {Geolocation} from '@ionic-native/geolocation';
 
 import { CallNumber } from '@ionic-native/call-number';
 import { SMS } from '@ionic-native/sms';
+
+// Import ionic2-rating module
+import { Ionic2RatingModule } from 'ionic2-rating';
 
 // AF2 Settings
 export const firebaseConfig = {
@@ -47,7 +51,8 @@ export const firebaseConfig = {
     SendHelpPage,
     RescuePage,
     DirectionPage,
-    CancelHelpPage
+    CancelHelpPage,
+    RatingPage
   ],
   imports: [
     BrowserModule,
@@ -56,7 +61,8 @@ export const firebaseConfig = {
     AngularFireDatabaseModule,
     AngularFirestoreModule,
     AngularFireAuthModule,
-    AgmCoreModule.forRoot({apiKey: 'AIzaSyCx29oB-zfGVhI1VJzZRYttSYrMtnOMie8'})
+    AgmCoreModule.forRoot({apiKey: 'AIzaSyCx29oB-zfGVhI1VJzZRYttSYrMtnOMie8'}),
+    Ionic2RatingModule // Put ionic2-rating module here
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -66,7 +72,8 @@ export const firebaseConfig = {
     SendHelpPage,
     RescuePage,
     DirectionPage,
-    CancelHelpPage
+    CancelHelpPage,
+    RatingPage
   ],
   providers: [
     StatusBar,

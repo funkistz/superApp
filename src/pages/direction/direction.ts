@@ -1,10 +1,11 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Platform, IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { Platform, IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
+import { UserProvider } from '../../providers/user/user';
 
 import { Geolocation } from '@ionic-native/geolocation';
 import { CallNumber } from '@ionic-native/call-number';
 import { SMS } from '@ionic-native/sms';
-import { CancelHelpPage } from '../cancel-help/cancel-help';
+import { HomePage } from '../home/home';
 
 declare var google;
 
@@ -32,8 +33,10 @@ export class DirectionPage {
     private callNumber: CallNumber,
     private sms: SMS,
     public toastCtrl: ToastController,
-  ) {
-
+    public alertCtrl: AlertController,
+    public userData: UserProvider
+  )
+  {
 
     this.victim = navParams.get("user");
     this.destination = {lat: this.victim.lat, lng: this.victim.lng}
@@ -100,7 +103,7 @@ export class DirectionPage {
     if(this.platform.is('ios')){
     	window.open('maps://?q=' + destination, '_system');
     } else {
-    	let label = encodeURI('My Label');
+    	let label = encodeURI(this.victim.first_name);
     	window.open('geo:0,0?q=' + destination + '(' + label + ')', '_system');
     }
   }
@@ -122,9 +125,65 @@ export class DirectionPage {
   }
 
   cancel(){
-    this.navCtrl.push(CancelHelpPage, {
-      user: this.victim
+
+    let prompt = this.alertCtrl.create({
+      title: 'Cancel Helping!',
+      message: "You can use your power to help him/her. Why do you want to cancel it?",
+      inputs: [
+        {
+          name: 'reason',
+          placeholder: 'Type something...'
+        },
+      ],
+      buttons: [
+        {
+          text: 'Close',
+          handler: data => {
+
+          }
+        },
+        {
+          text: 'Reply',
+          handler: data => {
+
+            this.userData.updateOther(
+            this.victim.id,
+            {
+              status: 'canceled_assist',
+              reason: data.reason,
+              hero: null
+            });
+
+            this.userData.update({
+              status: 'idle',
+              victim: null
+            });
+
+            this.navCtrl.setRoot(HomePage);
+
+          }
+        }
+      ]
     });
+    prompt.present();
+
+  }
+
+  endMission(){
+
+    this.userData.update({
+      status: 'idle',
+      victim: null
+    });
+    this.userData.refresh();
+
+    let toast = this.toastCtrl.create({
+      message: 'Mission Ended',
+      duration: 3000
+    });
+    toast.present();
+
+    this.navCtrl.setRoot(HomePage);
   }
 
 }

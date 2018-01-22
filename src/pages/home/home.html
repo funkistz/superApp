@@ -4,12 +4,12 @@
     <button ion-button menuToggle>
       <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>SuperApp</ion-title>
+    <ion-title>Super App</ion-title>
   </ion-navbar>
 
   <ion-toolbar color="primary">
     <ion-title *ngIf="(userReal | async)?.status == 'broadcasting'">Getting your Hero...</ion-title>
-    <ion-title *ngIf="(userReal | async)?.status != 'broadcasting'">Welcome {{ (userReal | async)?.first_name }}</ion-title>
+    <ion-title *ngIf="(userReal | async)?.status != 'broadcasting'" text-capitalize>Welcome {{ (userReal | async)?.first_name }}</ion-title>
   </ion-toolbar>
 
 </ion-header>
@@ -46,7 +46,7 @@
             <ion-icon name="close"></ion-icon>
             Cancel
           </button>
-          <button *ngIf="(userReal | async)?.status == 'searching'" icon-left ion-button color="success" (click)="goRescuing()">
+          <button *ngIf="(userReal | async)?.status == 'searching' || (userReal | async)?.status == 'helping'" icon-left ion-button color="success" (click)="goRescuing()">
             <ion-icon name="close"></ion-icon>
             Rescue now
           </button>
@@ -55,6 +55,17 @@
           <button *ngIf="(userReal | async)?.status == 'broadcasting'" icon-left ion-button color="danger" (click)="cancelBroadcasting()">
             <ion-icon name="close"></ion-icon>
             Cancel
+          </button>
+
+          <!-- assisted -->
+          <button *ngIf=" (userReal | async)?.status == 'assisted'" ion-button color="success" (click)="callHero()">
+            Call
+          </button>
+          <button *ngIf=" (userReal | async)?.status == 'assisted'" ion-button color="danger" (click)="cancelHero()">
+            Cancel
+          </button>
+          <button *ngIf=" (userReal | async)?.status == 'assisted'" ion-button color="success" (click)="problemSolved()">
+            Problem Solved
           </button>
 
           <!-- solving -->

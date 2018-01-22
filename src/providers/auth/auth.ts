@@ -13,6 +13,7 @@ export class AuthProvider {
 
   userList : AngularFirestoreCollection<any>;
   user_key : any;
+  users: Observable<any[]>;
   public accountInfo;
 
   constructor(
@@ -35,6 +36,20 @@ export class AuthProvider {
   loginUser(email: string, password: string): Promise<any> {
 
     let user = firebase.auth().signInWithEmailAndPassword(email, password);
+
+    this.userList = this.afs.collection('users', ref => ref.where('email', '==', email).limit(1) );
+
+    this.users = this.userList.snapshotChanges().map( v => {
+        return v.map(a => {
+            const data = a.payload.doc.data();
+            const id = a.payload.doc.id;
+            return { id, ...data };
+        });
+    });
+
+    this.users.subscribe(docs => {
+      this.setUserData(docs[0]);
+    })
 
     return user;
   }
@@ -69,6 +84,7 @@ export class AuthProvider {
   }
 
   logoutUser(): Promise<void> {
+    this.setUserData(null);
     return firebase.auth().signOut();
   }
 
