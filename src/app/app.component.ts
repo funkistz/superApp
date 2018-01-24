@@ -9,6 +9,8 @@ import { AuthProvider } from '../providers/auth/auth';
 
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { ProfilePage } from '../pages/profile/profile';
+
 import 'rxjs/add/operator/do';
 import {
   AngularFirestore,
@@ -109,5 +111,9 @@ export class MyApp {
   logout() {
     firebase.auth().signOut();
     this.nav.setRoot(LoginPage);
+  }
+
+  profile() {
+    this.nav.push(ProfilePage);
   }
 }

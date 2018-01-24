@@ -1,51 +1,48 @@
-<ion-header>
 
-  <ion-navbar color="secondary">
-    <ion-title>Sign Up</ion-title>
-  </ion-navbar>
+<ion-content padding class="bg-image">
 
-</ion-header>
 
-<ion-content padding>
-  <form [formGroup]="signupForm" (submit)="signupUser()" novalidate>
+  <h2 text-center style="margin-top:30px; margin-bottom:30px;"><strong>Sign Up</strong></h2>
+
+  <form [formGroup]="signupForm" (submit)="signupUser()" novalidate >
 
     <ion-item>
-      <ion-label stacked>Email</ion-label>
-      <ion-input formControlName="email" type="email" placeholder="Your email address"
+      <ion-input formControlName="email" type="email" placeholder="Your Email"
         [class.invalid]="!signupForm.controls.email.valid && blur">
       </ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Password</ion-label>
-      <ion-input formControlName="password" type="password" placeholder="Your password"
+      <ion-input formControlName="password" type="password" placeholder="Password"
         [class.invalid]="!signupForm.controls.password.valid && blur">
       </ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>First Name</ion-label>
-      <ion-input formControlName="firstName" type="text"
+      <ion-input formControlName="firstName" type="text" placeholder="First Name"
         [class.invalid]="!signupForm.controls.firstName.valid && blur">
       </ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Last Name</ion-label>
-      <ion-input formControlName="lastName" type="text"
+      <ion-input formControlName="lastName" type="text" placeholder="Last Name"
         [class.invalid]="!signupForm.controls.lastName.valid && blur">
       </ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-label stacked>Phone</ion-label>
-      <ion-input formControlName="phone" type="phone"
+    <ion-item margin-bottom>
+      <ion-input formControlName="phone" type="phone" placeholder="Phone No"
         [class.invalid]="!signupForm.controls.phone.valid && blur">
       </ion-input>
     </ion-item>
 
-    <button ion-button block type="submit" [disabled]="!signupForm.valid">
+    <button ion-button block type="submit" [disabled]="!signupForm.valid" color="secondary">
       Create an Account
     </button>
   </form>
+
+  <button ion-button block clear (click)="goToLogin()" color="secondary" margin-top>
+    Login
+  </button>
+
 </ion-content>

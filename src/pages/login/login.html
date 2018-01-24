@@ -1,37 +1,43 @@
-<ion-header>
 
-  <ion-navbar color="secondary">
-    <ion-title>Login</ion-title>
-  </ion-navbar>
 
-</ion-header>
+<ion-content padding class="bg-image">
 
-<ion-content padding>
+  <ion-grid style="margin-top:30px; margin-bottom:20px;">
+    <ion-row>
+      <ion-col col-2></ion-col>
+      <ion-col col-8>
+        <ion-thumbnail>
+            <img src="./assets/imgs/icon.png" >
+        </ion-thumbnail>
+      </ion-col>
+      <ion-col col-2></ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <h2 text-center margin-bottom><strong>SUPER APP</strong></h2>
   <form [formGroup]="loginForm" (submit)="loginUser()" novalidate>
 
-    <ion-item>
-      <ion-label stacked>Email</ion-label>
+    <ion-item margin-bottom>
       <ion-input formControlName="email" type="email" placeholder="Your email address"
         [class.invalid]="!loginForm.controls.email.valid && blur"></ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-label stacked>Password</ion-label>
+    <ion-item margin-bottom>
       <ion-input formControlName="password" type="password" placeholder="Your password"
         [class.invalid]="!loginForm.controls.password.valid && blur"></ion-input>
     </ion-item>
 
-    <button ion-button block type="submit" [disabled]="!loginForm.valid">
+    <button ion-button block type="submit" [disabled]="!loginForm.valid" color="secondary">
       Login
     </button>
 
   </form>
 
-  <button ion-button block clear (click)="goToSignup()">
+  <button ion-button block clear (click)="goToSignup()" color="secondary" margin-top>
     Create a new account
   </button>
 
-  <button ion-button block clear (click)="goToResetPassword()">
+  <button ion-button block clear (click)="goToResetPassword()" color="secondary">
     I forgot my password
   </button>
 

@@ -44,7 +44,7 @@ export class SendHelpPage {
   sendHelp(problem){
 
       this.loading = this.loadingCtrl.create({
-        content: 'Sending Help...'
+        content: 'Requesting Help...'
       });
 
       this.loading.present();

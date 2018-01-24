@@ -22,9 +22,14 @@
     </ion-item>
   </ion-list> -->
 
-  <agm-map [latitude]="user.lat" [longitude]="user.lng" class="map">
-    <agm-marker [latitude]="(userReal | async)?.lat" [longitude]="(userReal | async)?.lng" [label]="label"></agm-marker>
-    <agm-marker *ngFor="let victim of victims | async" [latitude]="victim.lat" [longitude]="victim.lng" [label]="victim.first_name"></agm-marker>
+  <agm-map [latitude]="lat" [longitude]="lng" [zoom]="zoom" class="map">
+    <agm-marker [latitude]="locationTracker.lat" [longitude]="locationTracker.lng"></agm-marker>
+    <agm-marker *ngFor="let victim of victims | async" [latitude]="victim.lat" [longitude]="victim.lng" [label]="label">
+      <agm-info-window>
+        <strong>{{ victim.first_name }}</strong><br>
+        <strong>Problem: {{ victim.problem }}</strong>
+      </agm-info-window>
+    </agm-marker>
 
   </agm-map>
 
@@ -42,7 +47,7 @@
           </button>
 
           <!-- searching -->
-          <button *ngIf="(userReal | async)?.status == 'searching'" icon-left ion-button color="danger" (click)="cancelRescuing()">
+          <button *ngIf="(userReal | async)?.status == 'searching' || (userReal | async)?.status == 'helping'" icon-left ion-button color="danger" (click)="cancelRescuing()">
             <ion-icon name="close"></ion-icon>
             Cancel
           </button>

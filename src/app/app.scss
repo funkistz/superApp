@@ -34,4 +34,106 @@
 .side-menu button{
   color: #ffffff;
   background-color: transparent !important;
+  padding-left: 0;
+}
+
+.side-menu .item-md.item-block .item-inner{
+  border-bottom: 1px solid #666 !important;
+  padding-left: 16px;
+}
+
+.bg-image{
+  background-color: #ffea00;
+}
+
+ion-item {
+
+}
+
+.ios, .md {
+
+     .signup-col {
+       margin: 0px 16px 0px 16px;
+       padding-bottom: 20px;
+     }
+
+     .item-inner {
+       border-bottom-color: #ffffff !important;
+       box-shadow: none !important;
+     }
+
+    .list-header{
+        padding-left: 0;
+    }
+
+    ion-label[floating] {
+        margin-left: 10px;
+    }
+
+    .input-has-focus, .input-has-value{
+
+      ion-label[floating] {
+          margin-left: 0px;
+      }
+
+    }
+
+    .item-input, .item-datetime, .item-radio{
+      border-radius: 30px !important;
+      padding-left: 0px !important;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+      border: 2px solid #000;
+      box-shadow: none !important;
+    }
+
+    .text-input-md{
+      margin: 8px 8px;
+    }
+
+    .item-input .item-inner{
+      border-bottom-color: transparent !important;
+      box-shadow: none !important;
+      padding-right: 0;
+    }
+
+    .item-datetime{
+      background-color: #f2f2f2;
+      padding: 5px 10px;
+    }
+
+    .item-radio{
+      background-color: #f2f2f2;
+      padding: 5px 10px;
+    }
+
+    .item-datetime .item-inner{
+      border-bottom-color: #ccc;
+    }
+
+    ion-input, ion-select, ion-textarea {
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+
+    ion-datetime .item-cover{
+
+    }
+
+    .invalid {
+        border: 1px solid #ea6153;
+    }
+
+    .list-md .item-input.ng-valid.item-input-has-value:not(.input-has-focus):not(.item-input-has-focus):last-child, .list-md .item-input.ng-valid.input-has-value:not(.input-has-focus):not(.item-input-has-focus):last-child{
+      border: 2px solid #32db64;
+    }
+
+    .list-md .item-input:last-child {
+        border: 2px solid #000;
+    }
+
+}
+
+a[disabled], button[disabled], [ion-button][disabled]{
+  opacity: 0.8;
 }

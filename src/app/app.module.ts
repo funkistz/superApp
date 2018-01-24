@@ -12,10 +12,12 @@ import { RescuePage } from '../pages/rescue/rescue';
 import { DirectionPage } from '../pages/direction/direction';
 import { CancelHelpPage } from '../pages/cancel-help/cancel-help';
 import { RatingPage } from '../pages/rating/rating';
+import { ProfilePage } from '../pages/profile/profile';
 
 import { AuthProvider } from '../providers/auth/auth';
 import { SuperProvider } from '../providers/super/super';
 import { UserProvider } from '../providers/user/user';
+import { LocationTrackerProvider } from '../providers/location-tracker/location-tracker';
 
 // Import the AF2 Module
 import { AngularFireModule } from 'angularfire2';
@@ -26,6 +28,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { AgmCoreModule } from '@agm/core';
 import {Geolocation} from '@ionic-native/geolocation';
+import { BackgroundGeolocation } from '@ionic-native/background-geolocation';
 
 import { CallNumber } from '@ionic-native/call-number';
 import { SMS } from '@ionic-native/sms';
@@ -52,7 +55,8 @@ export const firebaseConfig = {
     RescuePage,
     DirectionPage,
     CancelHelpPage,
-    RatingPage
+    RatingPage,
+    ProfilePage
   ],
   imports: [
     BrowserModule,
@@ -73,7 +77,8 @@ export const firebaseConfig = {
     RescuePage,
     DirectionPage,
     CancelHelpPage,
-    RatingPage
+    RatingPage,
+    ProfilePage
   ],
   providers: [
     StatusBar,
@@ -83,9 +88,11 @@ export const firebaseConfig = {
     SuperProvider,
     UserProvider,
     Geolocation,
+    BackgroundGeolocation,
     AngularFireDatabase,
     CallNumber,
-    SMS
+    SMS,
+    LocationTrackerProvider
   ]
 })
 export class AppModule {}

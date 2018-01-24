@@ -3,8 +3,8 @@ import { NavController, Platform, ToastController, LoadingController, AlertContr
 import { AuthProvider } from '../../providers/auth/auth';
 import { SuperProvider } from '../../providers/super/super';
 import { UserProvider } from '../../providers/user/user';
-import { Geolocation } from '@ionic-native/geolocation';
 import { CallNumber } from '@ionic-native/call-number';
+import { LocationTrackerProvider } from '../../providers/location-tracker/location-tracker';
 
 import {
   AngularFirestore,
@@ -25,10 +25,13 @@ export class HomePage {
 
     @ViewChild('map') mapElement: ElementRef;
     google : any;
-    label = {text: 'You'};
+    zoom: number = 15;
+    label = {text: 'V'};
     private map: any;
     loading: any;
     user: any;
+    lat: any;
+    lng: any;
 
     userRef: AngularFirestoreDocument<any>;
     userReal: Observable<any>;
@@ -49,12 +52,13 @@ export class HomePage {
       private callNumber: CallNumber,
       public superData: SuperProvider,
       public userData: UserProvider,
-      private geolocation: Geolocation,
       public toastCtrl: ToastController,
       public loadingCtrl: LoadingController,
-      private afs: AngularFirestore
+      private afs: AngularFirestore,
+      public locationTracker: LocationTrackerProvider
     )
     {
+      this.locationTracker.startTracking();
 
       this.alertPresented = false;
       this.user = this.authData.getUserData();
@@ -64,6 +68,8 @@ export class HomePage {
 
       this.userReal.subscribe(doc => {
 
+        this.lat = doc.lat;
+        this.lng = doc.lng;
         this.userData.refresh();
         if(doc['status'] == "assisted" && doc['hero_status'] == "first" && this.userRealLoop == 0){
 
@@ -78,8 +84,15 @@ export class HomePage {
 
         }
 
+        if(doc['status'] == "victim_canceled"){
+
+            this.victimCanceled();
+
+        }
+
         if(doc['status'] == "searching" || doc['status'] == "helping"){
 
+          this.zoom = 10;
           this.victimsRef = this.afs.collection('users', ref => ref.where('hero', '==', this.user.id));
           this.victims = this.victimsRef.valueChanges();
 
@@ -89,16 +102,20 @@ export class HomePage {
                   const id = a.payload.doc.id;
                   return { id, ...data };
               });
-          }).subscribe(docs => {
+          }).subscribe(victim_docs => {
 
-            docs.forEach(doc => {
-              this.victimOffline = doc;
+            victim_docs.forEach(victim_doc => {
+
+              this.victimOffline = victim_doc;
+              this.lat = this.victimOffline.lat;
+              this.lng = this.victimOffline.lng;
             });
 
           });
 
         }else if(doc['status'] == "assisted"){
 
+          this.zoom = 10;
           this.victimsRef = this.afs.collection('users', ref => ref.where('victim', '==', this.user.id));
           this.victims = this.victimsRef.valueChanges();
 
@@ -123,22 +140,23 @@ export class HomePage {
 
       platform.ready().then(() => {
           this.getCurrentLocation()
-            console.log("Start Loding MAP....")
+            console.log("Start background tracking....")
        });
 
     }
 
     getCurrentLocation():void{
-      this.geolocation.getCurrentPosition().then((resp) => {
 
-        this.userData.update({
-          lat: resp.coords.latitude,
-          lng: resp.coords.longitude
+      var temp2 = this;
+      var tracker_interval = setInterval(function(){
+
+        temp2.userData.update({
+          lat: temp2.locationTracker.lat,
+          lng: temp2.locationTracker.lng
         });
 
-      }).catch((error) => {
-          console.log('Error getting location', error);
-      });
+      }, 2000);
+
     }
 
     getHelp() {
@@ -301,6 +319,7 @@ export class HomePage {
 
     cancelHero(){
 
+      this.userData.setUser();
       let prompt = this.alertCtrl.create({
         title: 'Cancel Hero',
         message: "Your hero is already on his/her way to help you. Why do you want to cancel it?",
@@ -320,7 +339,15 @@ export class HomePage {
           {
             text: 'Submit',
             handler: data => {
+              this.userData.updateOther(
+              this.authData.getUserData().hero,
+              {
+                victim:null,
+                victim_cancel_reason: data.reason,
+                status: 'victim_canceled'
+              });
               this.userData.update({
+                hero: null,
                 hero_cancel_reason: data.reason,
                 status: 'idle'
               });
@@ -392,6 +419,29 @@ export class HomePage {
                 handler: data => {
                   this.userData.update({
                     status: 'broadcasting'
+                  });
+                }
+              }
+            ]
+          }).present();
+        }
+
+    }
+
+    victimCanceled(){
+
+        let vm = this
+        if(!vm.alertPresented) {
+          vm.alertPresented = true
+          vm.alertCtrl.create({
+            title: 'Your victim canceled the helping request.',
+            message: "Reason: " + this.authData.getUserData().victim_cancel_reason,
+            buttons: [
+              {
+                text: 'Close',
+                handler: data => {
+                  this.userData.update({
+                    status: 'idle'
                   });
                 }
               }

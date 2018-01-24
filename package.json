@@ -22,6 +22,7 @@
     "@angular/platform-browser": "5.0.3",
     "@angular/platform-browser-dynamic": "5.0.3",
     "@ionic-native/android-permissions": "^4.5.2",
+    "@ionic-native/background-geolocation": "^4.5.2",
     "@ionic-native/call-number": "^4.5.2",
     "@ionic-native/core": "4.4.0",
     "@ionic-native/geolocation": "^4.5.2",
@@ -35,7 +36,8 @@
     "cordova-plugin-android-permissions": "^1.0.0",
     "cordova-plugin-device": "^1.1.4",
     "cordova-plugin-ionic-webview": "^1.1.16",
-    "cordova-plugin-splashscreen": "^4.0.3",
+    "cordova-plugin-mauron85-background-geolocation": "^2.3.3",
+    "cordova-plugin-splashscreen": "^5.0.1",
     "cordova-plugin-whitelist": "^1.3.1",
     "cordova-sms-plugin": "^0.1.11",
     "firebase": "4.8.0",
@@ -63,11 +65,20 @@
       "ionic-plugin-keyboard": {},
       "cordova-plugin-whitelist": {},
       "cordova-plugin-device": {},
-      "cordova-plugin-splashscreen": {},
       "cordova-plugin-ionic-webview": {},
       "cordova-plugin-android-permissions": {},
       "mx.ferreyra.callnumber": {},
-      "cordova-sms-plugin": {}
+      "cordova-sms-plugin": {},
+      "cordova-plugin-mauron85-background-geolocation": {
+        "GOOGLE_PLAY_SERVICES_VERSION": "+",
+        "ICON": "@mipmap/icon",
+        "SMALL_ICON": "@mipmap/icon",
+        "ACCOUNT_NAME": "@string/app_name",
+        "ACCOUNT_LABEL": "@string/app_name",
+        "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
+        "CONTENT_AUTHORITY": "$PACKAGE_NAME"
+      },
+      "cordova-plugin-splashscreen": {}
     },
     "platforms": [
       "android"

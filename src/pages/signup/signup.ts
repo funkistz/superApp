@@ -3,11 +3,11 @@ import { IonicPage,
   NavController,
   Loading,
   LoadingController,
-  AlertController } from 'ionic-angular';
+  AlertController, ToastController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthProvider } from '../../providers/auth/auth';
 import { EmailValidator } from '../../validators/email';
-import { HomePage } from '../home/home';
+import { LoginPage } from '../login/login';
 import {AngularFireDatabase} from 'angularfire2/database';
 
 @IonicPage({
@@ -28,6 +28,7 @@ export class SignupPage {
     public formBuilder: FormBuilder,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
+    public toastCtrl: ToastController,
     public aDB: AngularFireDatabase,
   ) {
     this.signupForm = formBuilder.group({
@@ -58,8 +59,13 @@ export class SignupPage {
       )
       .then(() => {
 
+        this.toastCtrl.create({
+          message: 'Registered Successfully',
+          duration: 2000
+        }).present();
+
         this.loading.dismiss().then( () => {
-          this.navCtrl.setRoot(HomePage);
+          this.navCtrl.setRoot(LoginPage);
         });
 
       }, (error) => {
@@ -81,6 +87,10 @@ export class SignupPage {
     }
 
 
+  }
+
+  goToLogin(): void {
+    this.navCtrl.push(LoginPage);
   }
 
 }

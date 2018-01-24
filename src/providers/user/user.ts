@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import firebase from 'firebase';
-import {AngularFireDatabase} from 'angularfire2/database';
 import {
   AngularFirestore,
   AngularFirestoreDocument ,
@@ -16,15 +15,30 @@ export class UserProvider {
   users: Observable<any[]>;
   userArray:any = {};
 
+  userRef: AngularFirestoreDocument<any>;
+  userReal: Observable<any>;
+
   public helpBroadcast:any = {};
 
   constructor(
-    public aDB: AngularFireDatabase,
     private afs: AngularFirestore,
     public authData: AuthProvider,
   )
   {
 
+  }
+
+  setUser(){
+    this.userRef = this.afs.doc('users/' + this.authData.getUserData().id);
+    this.userReal = this.userRef.valueChanges();
+  }
+
+  getUserRef(){
+      return this.userRef;
+  }
+
+  getUser(){
+      return this.userReal;
   }
 
   refresh(){

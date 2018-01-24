@@ -6,9 +6,12 @@
   </ion-header>
 
   <ion-content class="side-menu">
-    <ion-list>
+    <ion-list margin-top>
       <button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
         {{p.title}}
+      </button>
+      <button menuClose ion-item (click)="profile()">
+        Profile
       </button>
       <button menuClose ion-item (click)="logout()">
         Logout

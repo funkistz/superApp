@@ -42,9 +42,13 @@ export class SuperProvider {
     this.users.subscribe(docs => {
 
       docs.forEach(doc => {
-        this.userArray[doc.id] = {};
-        this.userArray[doc.id]['latitude'] = doc.lat;
-        this.userArray[doc.id]['longitude'] = doc.lng;
+
+        if(doc.id != this.authData.getUserData().id){
+
+          this.userArray[doc.id] = {};
+          this.userArray[doc.id]['latitude'] = doc.lat;
+          this.userArray[doc.id]['longitude'] = doc.lng;
+        }
 
       });
 
