@@ -169,34 +169,41 @@ export class HomePage {
 
     rescue() {
 
-      this.loading = this.loadingCtrl.create({
-        content: 'Searching...'
-      });
-      this.loading.present();
+      var rescueing = true;
 
       this.userData.update({
         status: 'searching',
       });
 
-      var count = 0;
+      let alert = this.alertCtrl.create({
+        title: 'Finding Victim',
+        subTitle: 'Searching...',
+        enableBackdropDismiss: false,
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+
+              rescueing = false;
+              this.userData.update({
+                status: 'idle',
+                victim: null
+              });
+
+            }
+          }
+        ]
+      });
+      alert.present();
+
       var temp = this;
       var temp_victims = this.superData.setHelpBroadcast();
 
       var interval = setInterval(function(){
-        count++;
 
-        if(count > 5){
+        if(rescueing){
           clearInterval(interval);
-          temp.loading.dismiss();
-          temp.userData.update({
-            status: 'idle',
-            victim: null
-          });
-          let toast = temp.toastCtrl.create({
-            message: 'No victim found',
-            duration: 3000
-          });
-          toast.present();
         }
 
         if(temp.superData.getHelpBroadcast()){
@@ -213,7 +220,7 @@ export class HomePage {
             hero: temp.user.id,
           });
 
-          temp.loading.dismiss();
+          alert.dismiss();
           let toast = temp.toastCtrl.create({
             message: 'Nearest victim found',
             duration: 3000
